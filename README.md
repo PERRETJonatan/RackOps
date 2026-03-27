@@ -9,7 +9,7 @@
 
 > Built by developers, for data center operators. Real-time collision detection. Drag-and-drop simplicity.
 
-## ✨ Current Features (Phase 1 & 2)
+## ✨ Current Features (Phase 1, 2 & 3)
 
 ### Phase 1: MVP ✅
 - **Variable Rack Heights:** Support any rack size (12U, 24U, 42U, 48U, etc.)
@@ -25,6 +25,15 @@
 - **Snap-to-Grid:** Automatic alignment to U positions
 - **URL State Persistence:** Selected rack saved in URL for easy sharing and bookmarking
 - **Visual Feedback:** Drag indicators, collision warnings, opacity states
+
+### Phase 3: Power & Weight Analytics ✅
+- **Power Consumption Tracking:** Per-device wattage (W), rack totals, and density (W/U)
+- **Power Heatmap Visualization:** Color-coded devices showing energy intensity (red=critical 1000W+, orange=high 500-1000W, yellow=medium 100-500W, green=low <100W)
+- **Power Imbalance Detection:** Pareto analysis identifies when top 20% of devices consume 80%+ of power
+- **Weight Distribution Analytics:** Per-device weight (kg), rack totals, and density (kg/U)
+- **Weight Imbalance Warnings:** Detects when weight exceeds balanced thresholds
+- **Real-time Analytics API:** 4 dedicated endpoints for power and weight metrics across single/multiple racks
+- **Live Dashboard Cards:** Power consumption summary, weight distribution stats, combined analytics view
 
 ## 🚀 Tech Stack
 
@@ -133,6 +142,10 @@ $$(S_{new} \le E_{existing}) \land (S_{existing} \le E_{new})$$
 | `/api/devices` | POST | Add device (collision validated) |
 | `/api/devices/:id` | PATCH | Move device or edit metadata |
 | `/api/devices/:id` | DELETE | Remove device |
+| `/api/analytics/racks/:id/power` | GET | Power analytics for specific rack |
+| `/api/analytics/racks/:id/weight` | GET | Weight analytics for specific rack |
+| `/api/analytics/racks/:id/heatmap` | GET | Device heatmap (power intensity) for rack |
+| `/api/analytics/all` | GET | Aggregated analytics across all racks |
 
 ### Data Models
 
@@ -157,7 +170,9 @@ $$(S_{new} \le E_{existing}) \land (S_{existing} \le E_{new})$$
   type: Enum,          // Server, Switch, PDU, Patch Panel, Storage, UPS
   height_u: Integer,   // 1, 2, 4, etc.
   start_u: Integer,    // Position (1-indexed, bottom-up)
-  metadata: JSON       // {ip, power, serial, etc.}
+  power_watts: Integer,// Power consumption in watts (default: 0)
+  weight_kg: Float,    // Weight in kilograms (default: 0)
+  metadata: JSON       // {ip, serial, capacity, etc.}
 }
 ```
 
@@ -179,13 +194,16 @@ $$(S_{new} \le E_{existing}) \land (S_{existing} \le E_{new})$$
 - [x] URL state persistence (bookmark selected rack)
 - [x] Smooth interaction without layout shift
 
-### 🚧 Phase 3: Power & Weight Analytics
-- [ ] Power consumption tracking per device
-- [ ] Heatmap visualization of power distribution
-- [ ] Total wattage alerts by rack
-- [ ] Weight per device metadata
-- [ ] Weight distribution warnings
-- [ ] Power draw by device type
+### ✅ Phase 3: Power & Weight Analytics (Complete)
+- [x] Power consumption tracking per device (watts)
+- [x] Power density calculations (W/U)
+- [x] Heatmap visualization of power distribution with color coding
+- [x] Power imbalance detection (Pareto principle)
+- [x] Weight per device metadata (kg)
+- [x] Weight distribution analytics
+- [x] Weight imbalance warnings
+- [x] Analytics API endpoints (4 routes)
+- [x] Real-time dashboard cards & visualizations
 
 ### 🔮 Phase 4: Multi-Rack & Cabling
 - [ ] "Row View" for multiple racks
@@ -282,7 +300,9 @@ curl -X POST http://localhost:8080/api/devices \
     "type": "Server",
     "height_u": 2,
     "start_u": 40,
-    "metadata": {"ip": "192.168.1.10", "power": 500}
+    "power_watts": 850,
+    "weight_kg": 12,
+    "metadata": {"ip": "192.168.1.10", "serial": "SRV-2024-001"}
   }'
 
 # Move the server to U35
