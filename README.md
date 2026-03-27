@@ -1,5 +1,10 @@
 # 🖥️ RackOps
 
+[![Tests](https://github.com/PERRETJonatan/RackOps/actions/workflows/test.yml/badge.svg)](https://github.com/PERRETJonatan/RackOps/actions/workflows/test.yml)
+[![Code Quality](https://github.com/PERRETJonatan/RackOps/actions/workflows/quality.yml/badge.svg)](https://github.com/PERRETJonatan/RackOps/actions/workflows/quality.yml)
+[![License: MIT + Commons Clause](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-yellow.svg)](LICENSE)
+![Node.js 18+](https://img.shields.io/badge/Node.js-18+-green)
+
 **RackOps** is a lightweight, high-precision Data Center Infrastructure Management (DCIM) tool designed to visualize and manage physical server rack layouts. Unlike static spreadsheets, RackOps provides a dynamic, unit-aware interface to prevent physical equipment overlaps and optimize space utilization.
 
 > Built by developers, for data center operators. Real-time collision detection. Drag-and-drop simplicity.
@@ -72,6 +77,37 @@ npm run seed
 ```
 
 This populates 3 sample racks with 14 devices across different data centers for testing.
+
+## ✅ Testing & CI/CD
+
+### Run Tests Locally
+
+```bash
+# Backend tests (Jest - collision detection + API)
+cd server && npm run test
+
+# Frontend tests (Vitest - React components)
+cd client && npm run test
+
+# Run with coverage
+cd server && npm run test:coverage
+cd client && npm run test:coverage
+```
+
+**Test Results:**
+- Backend: 13 tests (collision detection algorithms + REST API endpoints)
+- Frontend: 3 tests (RackVisualizer component rendering and interaction)
+
+### Continuous Integration
+
+Every push to `main` or `develop` and all pull requests automatically run:
+
+✅ **Backend Tests** - Jest with coverage  
+✅ **Frontend Tests** - Vitest with coverage  
+✅ **Build Check** - Verify builds succeed  
+⚠️ **Code Quality** - Package validation & security audit  
+
+See [CI/CD Documentation](CI_CD.md) for detailed workflow information.
 
 ## 📐 Core Architecture
 

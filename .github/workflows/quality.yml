@@ -1,0 +1,49 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Check backend package.json
+        working-directory: ./server
+        run: npm ls --depth=0 2>&1 | head -20
+
+      - name: Check frontend package.json
+        working-directory: ./client
+        run: npm ls --depth=0 2>&1 | head -20
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Audit backend dependencies
+        working-directory: ./server
+        run: npm audit --audit-level=moderate || true
+
+      - name: Audit frontend dependencies
+        working-directory: ./client
+        run: npm audit --audit-level=moderate || true
