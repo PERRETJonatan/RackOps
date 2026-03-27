@@ -1,83 +1,291 @@
 # 🖥️ RackOps
 
-**RackOps** is a lightweight, high-precision Data Center Infrastructure Management (DCIM) tool designed to visualize and manage physical server rack layouts. Unlike static spreadsheets, RackOps provides a dynamic, unit-aware interface to prevent physical equipment overlaps and optimize space.
+**RackOps** is a lightweight, high-precision Data Center Infrastructure Management (DCIM) tool designed to visualize and manage physical server rack layouts. Unlike static spreadsheets, RackOps provides a dynamic, unit-aware interface to prevent physical equipment overlaps and optimize space utilization.
 
-## ✨ Features
+> Built by developers, for data center operators. Real-time collision detection. Drag-and-drop simplicity.
 
-  * **Variable Rack Heights:** Support for any rack size (12U, 24U, 42U, 48U, etc.).
-  * **Collision Detection Engine:** Intelligent backend logic that prevents two devices from occupying the same physical Rack Unit ($U$).
-  * **Bottom-Up Visualization:** Industry-standard numbering (Unit 1 at the floor) for authentic data center mapping.
-  * **Asset Metadata:** Track device types (Servers, Switches, PDUs), serial numbers, and power requirements.
-  * **Real-time Scaling:** Responsive CSS Grid/Flexbox UI that scales based on the rack's total units.
+## ✨ Current Features (Phase 1 & 2)
+
+### Phase 1: MVP ✅
+- **Variable Rack Heights:** Support any rack size (12U, 24U, 42U, 48U, etc.)
+- **Collision Detection Engine:** Intelligent validation prevents equipment overlaps
+- **Bottom-Up Visualization:** Industry-standard numbering (Unit 1 at floor level)
+- **Asset Metadata:** Track device types, serial numbers, IP addresses, power draw
+- **Real-time Scaling:** Responsive UI that adapts to rack dimensions
+- **REST API:** Full CRUD endpoints with validation
+
+### Phase 2: Drag-and-Drop ✅
+- **Smooth Drag-and-Drop UI:** Move devices within racks with click-and-drag
+- **Real-time Collision Warnings:** Visual feedback when dragging over invalid positions
+- **Snap-to-Grid:** Automatic alignment to U positions
+- **URL State Persistence:** Selected rack saved in URL for easy sharing and bookmarking
+- **Visual Feedback:** Drag indicators, collision warnings, opacity states
 
 ## 🚀 Tech Stack
 
-  * **Frontend:** React 18, Tailwind CSS, Lucide Icons, Axios.
-  * **Backend:** Node.js, Express.js.
-  * **Database:** PostgreSQL (with Sequelize ORM).
-  * **Validation:** Zod (Schema validation) & Custom Collision Middleware.
+**Frontend:**
+- React 18 + Vite (fast dev/build)
+- Tailwind CSS (responsive styling)
+- Lucide Icons (clean iconography)
+- Axios (HTTP client)
 
-## 🛠️ Installation
+**Backend:**
+- Node.js + Express.js (REST API)
+- SQLite (Phase 1-2) / PostgreSQL-ready
+- Zod (schema validation)
+- Custom collision detection middleware
+
+**Database:**
+- SQLite for development (no setup needed)
+- PostgreSQL for production (ORM-ready)
+
+## 🛠️ Installation & Quick Start
 
 ### Prerequisites
+- Node.js v18+
+- npm or yarn
 
-  * Node.js (v18+)
-  * PostgreSQL (or SQLite for local dev)
+### Setup (< 2 minutes)
 
-### Setup
+```bash
+# Clone repository
+git clone https://github.com/PERRETJonatan/RackOps.git
+cd RackOps
 
-1.  **Clone the repository**
+# Install all dependencies
+npm run build
 
-    ```bash
-    git clone https://github.com/your-username/rackops.git
-    cd rackops
-    ```
+# Start both servers (backend + frontend)
+npm run dev
+```
 
-2.  **Install Dependencies**
+**Access the application:**
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8080/api
+- **Health Check:** http://localhost:8080/health
 
-    ```bash
-    # Install Backend
-    cd server && npm install
+### Optional: Seed Sample Data
 
-    # Install Frontend
-    cd ../client && npm install
-    ```
+```bash
+cd server
+npm run seed
+```
 
-3.  **Environment Configuration**
-    Create a `.env` file in the `/server` directory:
+This populates 3 sample racks with 14 devices across different data centers for testing.
 
-    ```env
-    PORT=8080
-    DATABASE_URL=postgres://user:password@localhost:5432/rackops
-    ```
+## 📐 Core Architecture
 
-4.  **Run Development Mode**
+### Collision Detection Formula
 
-    ```bash
-    # From root
-    npm run dev
-    ```
+The collision engine prevents overlap by checking if device ranges intersect:
 
-## 📐 Core Logic: The Collision Formula
-
-To ensure physical accuracy, the backend validates every device placement. A collision is detected if a new device overlaps with an existing device's range $[Start, End]$.
-
-The overlap condition is defined as:
+**Range Overlap Check:**
 $$(S_{new} \le E_{existing}) \land (S_{existing} \le E_{new})$$
 
-Where $E$ (End Unit) is calculated as:
-$$E = S + H - 1$$
-*(Where $S$ is the starting unit and $H$ is the height in U)*
+**Where:**
+- $S$ = Start Unit (1-indexed)
+- $E$ = End Unit = $S + H - 1$ (H = height in U)
+- Valid range: $1 \le S \le total\_u$
 
-## 🗺️ Roadmap
+### API Endpoints
 
-  - [ ] **Phase 1:** Basic CRUD for Racks and Devices with overlap prevention.
-  - [ ] **Phase 2:** Drag-and-drop UI for reordering equipment within a rack.
-  - [ ] **Phase 3:** Power consumption heatmaps and weight distribution alerts.
-  - [ ] **Phase 4:** Multi-rack "Row View" and inter-device cabling visualization.
+| Endpoint | Method | Purpose |
+|:---------|:-------|:--------|
+| `/api/racks` | GET | List all racks with device counts |
+| `/api/racks/:id` | GET | Get full rack details + devices |
+| `/api/racks` | POST | Create new rack |
+| `/api/devices` | POST | Add device (collision validated) |
+| `/api/devices/:id` | PATCH | Move device or edit metadata |
+| `/api/devices/:id` | DELETE | Remove device |
 
------
+### Data Models
 
-## 🤝 Contributing
+**Rack:**
+```javascript
+{
+  id: UUID,
+  name: String,        // e.g., "DC1-ROW4-RACK02"
+  total_u: Integer,    // 12, 24, 42, 48, etc.
+  depth: Enum,         // "Full" or "Half"
+  location: String,    // Data center/room
+  device_count: Integer
+}
+```
 
-Contributions are welcome\! Please open an issue to discuss major changes before submitting a pull request.
+**Device:**
+```javascript
+{
+  id: UUID,
+  rack_id: UUID,
+  name: String,        // e.g., "SERVER-01"
+  type: Enum,          // Server, Switch, PDU, Patch Panel, Storage, UPS
+  height_u: Integer,   // 1, 2, 4, etc.
+  start_u: Integer,    // Position (1-indexed, bottom-up)
+  metadata: JSON       // {ip, power, serial, etc.}
+}
+```
+
+## 🗺️ Development Roadmap
+
+### ✅ Phase 1: MVP (Complete)
+- [x] SQLite database with Rack & Device schemas
+- [x] Express REST API with validation
+- [x] Collision detection middleware
+- [x] Basic React UI with rack visualization
+- [x] Add/Delete device operations
+- [x] Real-time error feedback
+
+### ✅ Phase 2: Drag-and-Drop (Complete)
+- [x] Drag-and-drop device reordering
+- [x] Real-time collision detection during drag
+- [x] Snap-to-grid positioning
+- [x] Visual feedback (grip handles, opacity, warnings)
+- [x] URL state persistence (bookmark selected rack)
+- [x] Smooth interaction without layout shift
+
+### 🚧 Phase 3: Power & Weight Analytics
+- [ ] Power consumption tracking per device
+- [ ] Heatmap visualization of power distribution
+- [ ] Total wattage alerts by rack
+- [ ] Weight per device metadata
+- [ ] Weight distribution warnings
+- [ ] Power draw by device type
+
+### 🔮 Phase 4: Multi-Rack & Cabling
+- [ ] "Row View" for multiple racks
+- [ ] Rack comparison view
+- [ ] Front/Back view toggle
+- [ ] Inter-device cabling visualization
+- [ ] Cable path planning
+- [ ] Port mapping UI
+
+### 📋 Phase 5: Advanced Features (Future)
+- [ ] PostgreSQL migration guide
+- [ ] Authentication & RBAC
+- [ ] Audit logging (who moved what, when)
+- [ ] Backup/restore functionality
+- [ ] Import from CSV
+- [ ] Export to PDF/SVG
+- [ ] Mobile app (React Native)
+- [ ] Real-time collaboration (WebSockets)
+
+## 🎮 Testing the Application
+
+### 1. View Sample Racks
+- App loads with 3 pre-seeded racks (if you ran `npm run seed`)
+- Select different racks from the sidebar
+
+### 2. Test Drag-and-Drop
+- Click and drag any device vertically
+- Watch the U position update in real-time
+- Try dragging into overlapping space—collision warning appears
+- Release on valid space to save
+
+### 3. Test Collision Detection
+- Try adding a device to a position occupied by another
+- API will reject with a clear error message
+- Try dragging a tall device into insufficient space—it snaps to valid position
+
+### 4. URL Persistence
+- Select a rack, check the URL: `?rackId=...`
+- Copy the URL and share it—others see the same rack
+- Refresh (Ctrl+R)—stays on the same rack
+
+## 📁 Project Structure
+
+```
+RackOps/
+├── server/                        # Node.js Backend
+│   ├── src/
+│   │   ├── index.js              # Express server entry
+│   │   ├── db/init.js            # SQLite initialization
+│   │   ├── models/index.js       # Rack & Device models
+│   │   ├── middleware/
+│   │   │   └── collisionEngine.js # Overlap detection logic
+│   │   └── routes/
+│   │       ├── racks.js          # Rack endpoints
+│   │       └── devices.js        # Device endpoints
+│   ├── seed.js                    # Sample data seeder
+│   └── package.json
+│
+├── client/                        # React Frontend (Vite)
+│   ├── src/
+│   │   ├── App.jsx               # Main component
+│   │   ├── components/
+│   │   │   └── RackVisualizer.jsx # Rack visualization
+│   │   └── index.css             # Tailwind imports
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   └── package.json
+│
+├── SPEC.md                        # Technical specification
+├── QUICKSTART.md                  # Setup guide
+├── README.md                      # This file
+└── package.json                   # Root (concurrency runner)
+```
+
+## 🎯 Example: Create & Manage a Rack
+
+```bash
+# Create a rack
+curl -X POST http://localhost:8080/api/racks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "DC1-ROW4-RACK02",
+    "total_u": 42,
+    "location": "Data Center 1, Row 4"
+  }'
+
+# Add a server (starts at U40, takes 2U)
+curl -X POST http://localhost:8080/api/devices \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rack_id": "YOUR_RACK_ID",
+    "name": "SERVER-01",
+    "type": "Server",
+    "height_u": 2,
+    "start_u": 40,
+    "metadata": {"ip": "192.168.1.10", "power": 500}
+  }'
+
+# Move the server to U35
+curl -X PATCH http://localhost:8080/api/devices/YOUR_DEVICE_ID \
+  -H "Content-Type: application/json" \
+  -d '{"start_u": 35}'
+```
+
+## 🔧 Troubleshooting
+
+**Port Already in Use:**
+```bash
+# Change port in server/.env
+PORT=8081
+npm run dev
+```
+
+**Database Issues:**
+```bash
+# Reset database (deletes all data)
+rm server/data/rackops.db
+npm run dev
+```
+
+**Dependencies Not Installing:**
+```bash
+npm run build  # Reinstalls everything
+```
+
+## 📞 Support & Contribution
+
+- **Bug Reports:** Open an issue on GitHub
+- **Feature Requests:** Discuss in issues first
+- **Pull Requests:** Welcome! Ensure collision engine tests pass
+
+## 📄 License
+
+See LICENSE file for details.
+
+---
+
+**Built with ❤️ for data center engineers who demand precision.**
