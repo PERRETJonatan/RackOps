@@ -13,7 +13,7 @@ Runs on: `push` to main/develop, `pull_request` to main/develop
 #### Backend Tests
 - Runs Jest test suite with coverage
 - Uploads coverage reports to Codecov
-- Node.js 18 on Ubuntu
+- Node.js 20+ (LTS) on Ubuntu
 
 ```bash
 npm run test -- --coverage
@@ -132,7 +132,7 @@ Pull requests must pass all status checks before merging:
 
 **Common causes:**
 - Platform differences (Windows vs Linux line endings)
-- Node.js version mismatch (use 18.x)
+- Node.js version mismatch (use 20.x LTS)
 - Missing dependencies (run `npm ci`)
 - Test environment issues (background processes)
 
@@ -143,7 +143,7 @@ rm -rf node_modules package-lock.json
 npm install
 
 # Match CI environment
-nvm use 18
+nvm use 20
 npm run test
 ```
 

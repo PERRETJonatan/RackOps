@@ -3,7 +3,7 @@
 [![Tests](https://github.com/PERRETJonatan/RackOps/actions/workflows/test.yml/badge.svg)](https://github.com/PERRETJonatan/RackOps/actions/workflows/test.yml)
 [![Code Quality](https://github.com/PERRETJonatan/RackOps/actions/workflows/quality.yml/badge.svg)](https://github.com/PERRETJonatan/RackOps/actions/workflows/quality.yml)
 [![License: MIT + Commons Clause](https://img.shields.io/badge/License-MIT%20%2B%20Commons%20Clause-yellow.svg)](LICENSE)
-![Node.js 18+](https://img.shields.io/badge/Node.js-18+-green)
+![Node.js 20+](https://img.shields.io/badge/Node.js-20+-green)
 
 **RackOps** is a lightweight, high-precision Data Center Infrastructure Management (DCIM) tool designed to visualize and manage physical server rack layouts. Unlike static spreadsheets, RackOps provides a dynamic, unit-aware interface to prevent physical equipment overlaps and optimize space utilization.
 
@@ -47,7 +47,7 @@
 ## 🛠️ Installation & Quick Start
 
 ### Prerequisites
-- Node.js v18+
+- Node.js v20+ (LTS recommended)
 - npm or yarn
 
 ### Setup (< 2 minutes)
