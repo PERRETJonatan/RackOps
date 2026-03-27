@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { initializeDatabase } from './db/init.js'
 import racksRouter from './routes/racks.js'
 import devicesRouter from './routes/devices.js'
+import analyticsRouter from './routes/analytics.js'
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ app.use(express.json())
 // Routes
 app.use('/api/racks', racksRouter)
 app.use('/api/devices', devicesRouter)
+app.use('/api/analytics', analyticsRouter)
 
 // Health check
 app.get('/health', (req, res) => {

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import RackVisualizer from './components/RackVisualizer'
+import { PowerConsumption, WeightDistribution } from './components/Analytics'
+import PowerHeatmap from './components/Heatmap'
 import './App.css'
 
 const API_BASE = 'http://localhost:8080/api'
@@ -151,6 +153,17 @@ function App() {
             </div>
           )}
         </div>
+
+        {/* Analytics Section */}
+        {selectedRack && (
+          <div className="mt-8 space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              <PowerConsumption rackId={selectedRackId} />
+              <WeightDistribution rackId={selectedRackId} />
+            </div>
+            <PowerHeatmap rackId={selectedRackId} totalU={selectedRack.total_u} />
+          </div>
+        )}
       </main>
     </div>
   )

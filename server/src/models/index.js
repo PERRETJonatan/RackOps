@@ -40,15 +40,15 @@ export class Device {
   static create(data) {
     return new Promise((resolve, reject) => {
       const id = uuidv4()
-      const { rack_id, name, type, height_u, start_u, metadata } = data
+      const { rack_id, name, type, height_u, start_u, power_watts, weight_kg, metadata } = data
       const sql = `
-        INSERT INTO devices (id, rack_id, name, type, height_u, start_u, metadata)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO devices (id, rack_id, name, type, height_u, start_u, power_watts, weight_kg, metadata)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `
       const metadataJson = metadata ? JSON.stringify(metadata) : null
-      getDb().run(sql, [id, rack_id, name, type, height_u, start_u, metadataJson], function(err) {
+      getDb().run(sql, [id, rack_id, name, type, height_u, start_u, power_watts || 0, weight_kg || 0, metadataJson], function(err) {
         if (err) reject(err)
-        else resolve({ id, rack_id, name, type, height_u, start_u, metadata })
+        else resolve({ id, rack_id, name, type, height_u, start_u, power_watts: power_watts || 0, weight_kg: weight_kg || 0, metadata })
       })
     })
   }
@@ -87,21 +87,23 @@ export class Device {
 
   static update(id, data) {
     return new Promise((resolve, reject) => {
-      const { name, type, height_u, start_u, metadata } = data
+      const { name, type, height_u, start_u, power_watts, weight_kg, metadata } = data
       const sql = `
         UPDATE devices
         SET name = COALESCE(?, name),
             type = COALESCE(?, type),
             height_u = COALESCE(?, height_u),
             start_u = COALESCE(?, start_u),
+            power_watts = COALESCE(?, power_watts),
+            weight_kg = COALESCE(?, weight_kg),
             metadata = COALESCE(?, metadata),
             updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `
       const metadataJson = metadata ? JSON.stringify(metadata) : null
-      getDb().run(sql, [name, type, height_u, start_u, metadataJson, id], function(err) {
+      getDb().run(sql, [name, type, height_u, start_u, power_watts, weight_kg, metadataJson, id], function(err) {
         if (err) reject(err)
-        else resolve({ id, name, type, height_u, start_u, metadata })
+        else resolve({ id, name, type, height_u, start_u, power_watts, weight_kg, metadata })
       })
     })
   }

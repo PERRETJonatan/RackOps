@@ -12,6 +12,8 @@ const createDeviceSchema = z.object({
   type: z.enum(['Server', 'Switch', 'PDU', 'Patch Panel', 'Storage', 'UPS']),
   height_u: z.number().int().min(1),
   start_u: z.number().int().min(1),
+  power_watts: z.number().int().min(0).optional(),
+  weight_kg: z.number().min(0).optional(),
   metadata: z.record(z.any()).optional()
 })
 
@@ -20,6 +22,8 @@ const updateDeviceSchema = z.object({
   type: z.enum(['Server', 'Switch', 'PDU', 'Patch Panel', 'Storage', 'UPS']).optional(),
   height_u: z.number().int().min(1).optional(),
   start_u: z.number().int().min(1).optional(),
+  power_watts: z.number().int().min(0).optional(),
+  weight_kg: z.number().min(0).optional(),
   metadata: z.record(z.any()).optional()
 })
 
