@@ -43,6 +43,8 @@ export const initializeDatabase = () => {
           type TEXT CHECK(type IN ('Server', 'Switch', 'PDU', 'Patch Panel', 'Storage', 'UPS')),
           height_u INTEGER NOT NULL,
           start_u INTEGER NOT NULL,
+          power_watts INTEGER DEFAULT 0 CHECK(power_watts >= 0),
+          weight_kg REAL DEFAULT 0 CHECK(weight_kg >= 0),
           metadata TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
