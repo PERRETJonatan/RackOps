@@ -20,6 +20,14 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
+      - name: Install server dependencies
+        working-directory: ./server
+        run: npm install --prefer-offline
+
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm install --prefer-offline
+
       - name: Check backend package.json
         working-directory: ./server
         run: npm ls --depth=0 2>&1 | head -20

@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./server
-        run: npm ci
+        run: npm install --prefer-offline
 
       - name: Run tests
         working-directory: ./server
@@ -52,7 +52,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./client
-        run: npm ci
+        run: npm install --prefer-offline
 
       - name: Run tests
         working-directory: ./client
@@ -80,7 +80,7 @@ jobs:
 
       - name: Install backend dependencies
         working-directory: ./server
-        run: npm ci
+        run: npm install --prefer-offline
 
       - name: Verify backend imports
         working-directory: ./server
@@ -88,7 +88,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ./client
-        run: npm ci
+        run: npm install --prefer-offline
 
       - name: Build frontend
         working-directory: ./client
